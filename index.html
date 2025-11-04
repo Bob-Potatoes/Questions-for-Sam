@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questions for Sam</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Questions</h1>
+    <p id="question">Loading questions...</p>
+    <button id="generate-btn" disabled>Get Question</button>
+  </div>
+
+  <script>
+    let questions = [];
+
+    async function loadQuestions() {
+      try {
+        // Replace this URL with your real backend endpoint
+        const response = await fetch("http://localhost:3000/api/questions");
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch questions");
+        }
+
+        questions = await response.json();
+
+        const questionEl = document.getElementById("question");
+        const buttonEl = document.getElementById("generate-btn");
+
+        if (questions.length > 0) {
+          questionEl.textContent = "Click below to get a question!";
+          buttonEl.disabled = false;
+        } else {
+          questionEl.textContent = "No questions available.";
+        }
+
+        buttonEl.addEventListener("click", () => {
+          const randomIndex = Math.floor(Math.random() * questions.length);
+          const randomQuestion = questions[randomIndex];
+          
+          // Handle both array of strings or array of objects (e.g., { text: "..." })
+          questionEl.textContent = typeof randomQuestion === "string" 
+            ? randomQuestion 
+            : randomQuestion.text;
+        });
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById("question").textContent = "Error loading questions.";
+      }
+    }
+
+    loadQuestions();
+  </script>
+</body>
+</html>
